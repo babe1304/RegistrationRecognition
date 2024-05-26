@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -68,8 +69,7 @@ def segment_characters(image):
 
     return char_list
 
-# Učitavanje slike
-path = "C:/Users/Comp/Desktop/doas/slike_rega/jsbbsjbd.png"
+path = "C:/Users/Comp/Desktop/doas/slike_rega/njdsdns.png"
 image = cv2.imread(path)
 
 # Provera da li je slika uspešno učitana
@@ -90,6 +90,16 @@ else:
         print("Nema segmentiranih karaktera.")
     else:
         print(f"Broj segmentiranih karaktera: {len(char_list)}")
+
+        # Kreiranje direktorijuma za čuvanje segmenata ako ne postoji
+        output_dir = "C:/Users/Comp/Desktop/doas/segmenti"
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Čuvanje izdvojenih karaktera
+        for i, char in enumerate(char_list):
+            segment_path = os.path.join(output_dir, f"segment{i+1}.png")
+            cv2.imwrite(segment_path, char)
 
         # Prikaz izdvojenih karaktera
         fig, axs = plt.subplots(1, len(char_list), figsize=(15, 5))
