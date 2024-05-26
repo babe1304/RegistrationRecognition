@@ -69,7 +69,7 @@ def segment_characters(image):
 
     return char_list
 
-path = "C:/Users/Comp/Desktop/doas/slike_rega/njdsdns.png"
+path = "C:/Users/Comp/Desktop/doas/slike_rega/cccc.png"
 image = cv2.imread(path)
 
 # Provera da li je slika uspešno učitana
