@@ -2,6 +2,9 @@ import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
+output_dir = "temp_output"
 
 def segment_characters(image):
     # Kroppovanje slike kako bi se uklonili neželjeni delovi
@@ -17,10 +20,10 @@ def segment_characters(image):
     _, thresh = cv2.threshold(blurred, 128, 255, cv2.THRESH_BINARY_INV)  # Možete prilagoditi prag 128
 
     # Prikazivanje binarizovane slike za proveru
-    plt.imshow(thresh, cmap='gray')
-    plt.title('Binarizovana slika')
-    plt.axis('off')
-    #plt.show()
+    # plt.imshow(thresh, cmap='gray')
+    # plt.title('Binarizovana slika')
+    # plt.axis('off')
+    # plt.show()
 
     # Definisanje kernel-a za morfološke operacije
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
@@ -30,10 +33,10 @@ def segment_characters(image):
     eroded = cv2.erode(dilated, kernel, iterations=1)
 
     # Prikazivanje erodovane i dilatirane slike za proveru
-    plt.imshow(eroded, cmap='gray')
-    plt.title('Erodovana i dilatirana slika')
-    plt.axis('off')
-    #plt.show()
+    # plt.imshow(eroded, cmap='gray')
+    # plt.title('Erodovana i dilatirana slika')
+    # plt.axis('off')
+    # plt.show()
 
     # Pronađi konture
     contours, _ = cv2.findContours(eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -41,10 +44,10 @@ def segment_characters(image):
     # Prikazivanje kontura na slici za proveru
     contour_image = cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR)
     cv2.drawContours(contour_image, contours, -1, (0, 255, 0), 2)
-    plt.imshow(contour_image)
-    plt.title('Konture na slici')
-    plt.axis('off')
-    #plt.show()
+    # plt.imshow(contour_image)
+    # plt.title('Konture na slici')
+    # plt.axis('off')
+    # plt.show()
 
     # Filtriraj konture i izdvoji karaktere
     char_list = []
@@ -69,44 +72,30 @@ def segment_characters(image):
 
     return char_list
 
+def main(path):
 
-filenames=os.listdir(f"{os.getcwd()}/slike_rega")
-for filename in filenames:
-    path = f"{os.getcwd()}/slike_rega/{filename}"
     image = cv2.imread(path)
-
-# Provera da li je slika uspešno učitana
     if image is None:
-        print(f"Greska: Slika na putanji {path} nije ucitana.")
+        print(f"Greška: Slika na putanji {path} nije učitana.")
     else:
         # Prikaz originalne slike
-        #plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        plt.title('Originalna slika')
-        plt.axis('off')
-        #plt.show()
+        # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        # plt.title('Originalna slika')
+        # plt.axis('off')
+        # plt.show()
 
         # Segmentacija karaktera
         char_list = segment_characters(image)
 
-        # Provera da li su karakteri uspešno segmentirani
-        if len(char_list) == 0:
-            print("Nema segmentiranih karaktera.")
-        else:
-            print(f"Broj segmentiranih karaktera: {len(char_list)}")
 
-            # Kreiranje direktorijuma za čuvanje segmenata ako ne postoji
-            output_dir = f"{os.getcwd()}/segmenti/{path.split('/')[-1]}"
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
+        for i, char in enumerate(char_list):
+            segment_path = os.path.join(output_dir, f"segment{i+1}.png")
+            cv2.imwrite(segment_path, char)
 
-            # Čuvanje izdvojenih karaktera
-            for i, char in enumerate(char_list):
-                segment_path = os.path.join(output_dir, f"segment{i+1}.png")
-                cv2.imwrite(segment_path, char)
+        return len(char_list)
 
-            # Prikaz izdvojenih karaktera
-            fig, axs = plt.subplots(1, len(char_list), figsize=(15, 5))
-            for i, char in enumerate(char_list):
-                axs[i].imshow(char, cmap='gray')
-                axs[i].axis('off')
-            #plt.show()
+        # fig, axs = plt.subplots(1, len(char_list), figsize=(15, 5))
+        # for i, char in enumerate(char_list):
+        #     axs[i].imshow(char, cmap='gray')
+        #     axs[i].axis('off')
+        # plt.show()
