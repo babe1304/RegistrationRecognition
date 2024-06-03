@@ -57,10 +57,10 @@ def segment_characters(image):
         aspect_ratio = w / float(h)
         if 0.2 < aspect_ratio < 1.0 and h > 15:  # Prilagoditi pragove po potrebi
             # Proširi bounding box za 2 piksela na svaku stranu
-            x = max(0, x - 2)
-            y = max(0, y - 2)
-            w = min(eroded.shape[1] - x, w + 4)
-            h = min(eroded.shape[0] - y, h + 4)
+            x = max(0, x - 3)
+            y = max(0, y - 4)
+            w = min(eroded.shape[1] - x, w + 6)
+            h = min(eroded.shape[0] - y, h + 8)
             
             char = eroded[y:y + h, x:x + w]
             char = cv2.resize(char, (20, 40))
@@ -99,3 +99,27 @@ def main(path):
         #     axs[i].imshow(char, cmap='gray')
         #     axs[i].axis('off')
         # plt.show()
+
+if __name__=='__main__':
+    print("msj")
+    fnames=os.listdir(f'{os.getcwd()}/slike_rega')
+    for fname in fnames:
+        if fname.endswith('.png'):
+            imgpath=f'{os.getcwd()}/slike_rega/{fname}'
+            image = cv2.imread(imgpath)
+            if image is None:
+                print(f"Greška: Slika na putanji {imgpath} nije učitana.")
+            else:
+                char_list = segment_characters(image)
+
+
+            for i, char in enumerate(char_list):
+                output_dir = f"{os.getcwd()}\segmenti_reg\{fname}"
+                if not os.path.exists(output_dir):
+                   os.makedirs(output_dir)
+                segment_path = os.path.join(output_dir, f"segment{i+1}.png")
+                print(segment_path)
+                cv2.imwrite(segment_path, char)
+
+            
+    
